@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Translator</title>
+</head>
+<body>
+    <h1>Word Translator</h1>
+    <p>翻訳したい単語を入力してください:</p>
+    <input type="text" id="inputWord" placeholder="例: привет">
+    <button onclick="translateWordExtended()">翻訳</button>
+    <p>翻訳結果: <span id="translatedWord"></span></p>
+
+    <script>
+        function translateWordExtended() {
+            // 文字のマッピングを表すオブジェクトを作成
+            const translationMap = {
+                'а': 'a',
+                'э': 'a',
+                'є': 'a',
+                'ы': 'e',
+                'о': 'a',
+                'у': 'o',
+                'ў': 'v',
+                'я': 'e',
+                'е': 'i',
+                'и': 'i',
+                'і': 'i',
+                'ї': 'i',
+                'ё': 'u',
+                'ю': 'u',
+                'б': 'g',
+                'в': 'z',
+                'г': 'd',
+                'ґ': 'dz',
+                'д': 'b',
+                'ж': 'ts',
+                'з': 'v',
+                'й': 'y',
+                'к': 't',
+                'л': 'r',
+                'м': 'n',
+                'н': 'm',
+                'п': 'k',
+                'р': 'l',
+                'с': 'f',
+                'т': 'p',
+                'ф': 's',
+                'х': 'sh',
+                'ц': 'ch',
+                'ч': 'zh',
+                'ш': 'x',
+                'щ': 'x',
+                'ь': 'i'
+            };
+
+            // 入力された単語を取得
+            let word = document.getElementById("inputWord").value;
+            let translatedWord = "";
+
+            // 文字ごとに翻訳を行う
+            for (let char of word) {
+                translatedWord += translationMap[char] || char;
+            }
+
+            // 結果を表示
+            document.getElementById("translatedWord").textContent = translatedWord;
+        }
+    </script>
+</body>
+</html>
