@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Transformation</title>
+</head>
+<body>
+    <h1>Text Transformation</h1>
+    
+    <!-- テキスト入力フィールド -->
+    <textarea id="inputText" rows="4" cols="50" placeholder="Enter your sentence here..."></textarea>
+    <br><br>
+
+    <!-- 変換ボタン -->
+    <button onclick="transformText()">Transform Text</button>
+
+    <!-- 結果表示フィールド -->
+    <h2>Transformed Text:</h2>
+    <p id="outputText"></p>
+
+    <script>
+        function transformText() {
+            let sentence = document.getElementById("inputText").value;
+            let words = sentence.split(/\s+/);
+            let vowels = "aeiouAEIOU";
+            let newWords = [];
+
+            // 置換ルールの定義
+            let replacements = {
+                "xl": "vl",
+                "chl": "ch",
+                "m": "n",
+                "d": "t",
+                "ts": "s",
+                "br": "pr",
+                "zv": "v",
+                "r": "il",
+                "pt": "ft",
+                "p": "f",
+                "l": "dl",
+                "tsv": "xv",
+                "tr": "ts",
+                "Φ": "g",
+                "k": "x",
+                "gl": "kl",
+                "vl": "v",
+                "tv": "sf",
+                "n": "m",
+                "j": "Φ",
+                "p": "pr",
+                "sp": "sf",
+                "sl": "Φ",
+                "v": "Φ",
+                "sn": "sm",
+                "b": "p",
+                "fs": "vas",
+                "zl": "z",
+                "bl": "pal"
+            };
+
+            for (let word of words) {
+                // 母音で始まる単語に「Φ」を追加
+                if (vowels.includes(word[0])) {
+                    word = "Φ" + word;
+                }
+
+                // 子音置換ルールの適用
+                for (let old in replacements) {
+                    if (word.startsWith(old)) {
+                        word = replacements[old] + word.slice(old.length);
+                        break; // 最初に一致した置換ルールを適用し、次に進む
+                    }
+                }
+
+                newWords.push(word);
+            }
+
+            // 結果を表示
+            document.getElementById("outputText").innerText = newWords.join(" ");
+        }
+    </script>
+</body>
+</html>
