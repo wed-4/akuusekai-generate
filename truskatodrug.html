@@ -82,6 +82,12 @@
             <button onclick="transformText()">Transform</button>
         </div>
 
+        <div class="input-area">
+            <label class="input-label" for="file-input">Or upload a text file:</label><br>
+            <input type="file" id="file-input" accept=".txt" /><br>
+            <button onclick="uploadAndTransform()">Upload and Transform</button>
+        </div>
+
         <div class="output-area">
             <div class="output-box" id="output-text">
                 Your transformed text will appear here...
@@ -151,6 +157,32 @@
 
             // Additional cleaning and return final text
             return text.replace(/#/g, '').replace(/ģ/g, 'g');
+        }
+
+        // Function to read and transform text from the uploaded file
+        function uploadAndTransform() {
+            const fileInput = document.getElementById("file-input");
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Please upload a text file!");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const fileContent = event.target.result;
+
+                // Transform the content of the uploaded file
+                let transformedText = replaceLongVowels(fileContent);
+                transformedText = replaceText(transformedText);
+
+                // Display the transformed text
+                document.getElementById("output-text").textContent = transformedText;
+            };
+            
+            // Read the file as text
+            reader.readAsText(file);
         }
     </script>
 </body>
