@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>単語変換ツール</title>
+    <style>
+        body {
+            background-color: black;
+            color: red;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
+
+        h1 {
+            color: red;
+            text-shadow: 2px 2px 4px #000000;
+        }
+
+        input[type="text"], textarea {
+            background-color: #1a1a1a;
+            color: red;
+            border: 1px solid red;
+            padding: 10px;
+            width: 80%;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #333;
+            color: red;
+            border: 1px solid red;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: red;
+            color: black;
+        }
+
+        .output {
+            background-color: #1a1a1a;
+            border: 1px solid red;
+            padding: 10px;
+            margin-top: 20px;
+            width: 80%;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <h1>トルスカ語→ドゥルグ語変換器</h1>
+    <p>入力された単語を変換します。</p>
+    <input type="text" id="input-word" placeholder="単語を入力..." />
+    <button onclick="transformAndDisplay()">変換</button>
+    
+    <div class="output" id="output"></div>
+
+    <script>
+        const consonants = [
+            'm', 'spr', 'sp', 'pr', 'p', 'br', 'b', 'fr', 'f', 'v', 'n', 'str', 'st', 'tr', 't', 'dr', 'd', 
+            'scl', 'sc', 'cl', 'sl', 'z', 'l', 'schr', 'sch', 'chr', 'ch', 'c', 'shr', 'sh', 'j', 'ņ', 
+            'sçļ', 'sç', 'çļ', 'ģļ', 'ģ', 'çhļ', 'çh', 'ç', 'y', 'ļ', 'skr', 'kr', 'sk', 'k', 'gr', 'g', 
+            'xr', 'x', 'w', "'", 's', 'r'
+        ];
+
+        const vowels = [
+            'i', 'ï', 'u', 'ü', 'e', 'ë', 'o', 'ö', 'a', 'ī', 'î', 'ū', 'û', 'ē', 'ê', 'ō', 'ô', 'a', 'ā'
+        ];
+
+        const consonantReplacements = [
+            ['ghr#', 'ghr#'], ['xr#', 'xr#'], ['sh#', 'sh#'], ['s#', 's#'], ['f#', 'f#'],
+            ['schr', 'kr'], ['skr', 'qr'], ['shr', 'chr'], ['sçļ', 'qr'], ['çhļ', 'kr'],
+            ['chr', 'j'], ['sch', 'k'], ['scl', 'sl'], ['str', 'kr'], ['spr', 'tr'],
+            ['fr', 'pr'], ['pr', 'br'], ['br', 'v'], ['sp', 't'], ['sl', 'cl'],
+            ['cl', 'dr'], ['dr', 'z'], ['tr', 'r'], ['st', 'k'], ['sc', 's'],
+            ['sh', 'ch'], ['ch', 'j'], ['çh', 'k'], ['ģh', 'x'], ['çļ', 'gr'],
+            ['ģļ', 'ghr'], ['sç', 'q'], ['gh', 'x'], ['xr', 'kr'], ['kr', 'gr'],
+            ['sk', 'q'], ['f', 'p'], ['p', 'b'], ['b', 'v'], ['s', 'c'],
+            ['c', 'd'], ['d', 'z'], ['t', 'r'], ['r', "'"], ['l', 'l'],
+            ['ç', 'g'], ['ģ', 'gh'], ['x', 'k'], ['k', 'g'], ['g', 'gh'],
+            ["'", 'q']
+        ];
+
+        const vowelReplacements = {
+            'a': 'u', 'i': 'e', 'ï': 'ui', 'u': 'o', 'ü': 'ü', 'e': 'a',
+            'ë': 'oi', 'o': 'u', 'ö': 'ö', 'ā': 'a', 'ī': 'i', 'î': 'u',
+            'ū': 'u', 'û': 'ü', 'ē': 'e', 'ê': 'o', 'ō': 'o', 'ô': 'ö',
+            'ā': 'a'
+        };
+
+        function replaceLongVowels(word) {
+            const replacements = {
+                'iģh': 'ī', 'ïgh': 'î', 'ugh': 'ū', 'üģh': 'û', 'eģh': 'ē', 'ëgh': 'ê',
+                'ogh': 'ō', 'öģh': 'ô', 'agh': 'ā', 'aģh': 'ā'
+            };
+            for (let key in replacements) {
+                word = word.replace(new RegExp(key, 'g'), replacements[key]);
+            }
+            return word;
+        }
+
+        function replaceConsonants(word) {
+            consonantReplacements.forEach(([pattern, replacement]) => {
+                word = word.replace(new RegExp(pattern, 'g'), replacement);
+            });
+            return word;
+        }
+
+        function replaceVowels(word) {
+            Object.keys(vowelReplacements).forEach(vowel => {
+                word = word.replace(new RegExp(vowel, 'g'), vowelReplacements[vowel]);
+            });
+            return word;
+        }
+
+        function cleanString(word) {
+            return word.replace(/#/g, '').replace(/ģ/g, 'g');
+        }
+
+        function transformWord(word) {
+            word = replaceLongVowels(word);
+            word = replaceConsonants(word);
+            word = replaceVowels(word);
+            return cleanString(word);
+        }
+
+        function transformAndDisplay() {
+            const inputWord = document.getElementById("input-word").value;
+            const transformedWord = transformWord(inputWord);
+            document.getElementById("output").textContent = `入力された単語: ${inputWord} => 変換後の単語: ${transformedWord}`;
+        }
+    </script>
+</body>
+</html>
