@@ -3,134 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>単語変換ツール</title>
+    <title>Text Transformer</title>
     <style>
         body {
-            background-color: black;
-            color: red;
-            font-family: 'Courier New', monospace;
-            text-align: center;
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Courier New', Courier, monospace;
         }
 
         h1 {
-            color: red;
-            text-shadow: 2px 2px 4px #000000;
+            text-align: center;
+            color: #ff4444;
+            font-size: 2.5em;
+            margin-top: 20px;
         }
 
-        input[type="text"], textarea {
-            background-color: #1a1a1a;
-            color: red;
-            border: 1px solid red;
-            padding: 10px;
+        .container {
+            width: 90%;
+            margin: 0 auto;
+        }
+
+        .input-area {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        textarea {
             width: 80%;
-            margin-bottom: 20px;
+            height: 100px;
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            border: 1px solid #333333;
+            padding: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.1em;
         }
 
         button {
-            background-color: #333;
-            color: red;
-            border: 1px solid red;
+            background-color: #ff4444;
+            color: #fff;
+            border: none;
             padding: 10px 20px;
+            font-size: 1.2em;
             cursor: pointer;
-            transition: 0.3s;
+            margin-top: 10px;
         }
 
         button:hover {
-            background-color: red;
-            color: black;
+            background-color: #e63333;
         }
 
-        .output {
-            background-color: #1a1a1a;
-            border: 1px solid red;
-            padding: 10px;
-            margin-top: 20px;
+        .output-area {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .output-box {
             width: 80%;
-            display: inline-block;
+            margin: 20px auto;
+            background-color: #1e1e1e;
+            padding: 15px;
+            border: 1px solid #333333;
+            color: #e0e0e0;
+        }
+
+        .input-label {
+            color: #ff4444;
+            font-size: 1.2em;
         }
     </style>
 </head>
 <body>
-    <h1>トルスカ語→ドゥルグ語変換器</h1>
-    <p>入力された単語を変換します。</p>
-    <input type="text" id="input-word" placeholder="単語を入力..." />
-    <button onclick="transformAndDisplay()">変換</button>
-    
-    <div class="output" id="output"></div>
+    <h1>Text Transformer</h1>
+    <div class="container">
+        <div class="input-area">
+            <label class="input-label" for="input-text">Enter text to transform:</label><br>
+            <textarea id="input-text" placeholder="Type your words here..."></textarea><br>
+            <button onclick="transformText()">Transform</button>
+        </div>
+
+        <div class="output-area">
+            <div class="output-box" id="output-text">
+                Your transformed text will appear here...
+            </div>
+        </div>
+    </div>
 
     <script>
-        const consonants = [
-            'm', 'spr', 'sp', 'pr', 'p', 'br', 'b', 'fr', 'f', 'v', 'n', 'str', 'st', 'tr', 't', 'dr', 'd', 
-            'scl', 'sc', 'cl', 'sl', 'z', 'l', 'schr', 'sch', 'chr', 'ch', 'c', 'shr', 'sh', 'j', 'ņ', 
-            'sçļ', 'sç', 'çļ', 'ģļ', 'ģ', 'çhļ', 'çh', 'ç', 'y', 'ļ', 'skr', 'kr', 'sk', 'k', 'gr', 'g', 
-            'xr', 'x', 'w', "'", 's', 'r'
-        ];
-
-        const vowels = [
-            'i', 'ï', 'u', 'ü', 'e', 'ë', 'o', 'ö', 'a', 'ī', 'î', 'ū', 'û', 'ē', 'ê', 'ō', 'ô', 'a', 'ā'
-        ];
-
-        const consonantReplacements = [
-            ['ghr#', 'ghr#'], ['xr#', 'xr#'], ['sh#', 'sh#'], ['s#', 's#'], ['f#', 'f#'],
-            ['schr', 'kr'], ['skr', 'qr'], ['shr', 'chr'], ['sçļ', 'qr'], ['çhļ', 'kr'],
-            ['chr', 'j'], ['sch', 'k'], ['scl', 'sl'], ['str', 'kr'], ['spr', 'tr'],
-            ['fr', 'pr'], ['pr', 'br'], ['br', 'v'], ['sp', 't'], ['sl', 'cl'],
-            ['cl', 'dr'], ['dr', 'z'], ['tr', 'r'], ['st', 'k'], ['sc', 's'],
-            ['sh', 'ch'], ['ch', 'j'], ['çh', 'k'], ['ģh', 'x'], ['çļ', 'gr'],
-            ['ģļ', 'ghr'], ['sç', 'q'], ['gh', 'x'], ['xr', 'kr'], ['kr', 'gr'],
-            ['sk', 'q'], ['f', 'p'], ['p', 'b'], ['b', 'v'], ['s', 'c'],
-            ['c', 'd'], ['d', 'z'], ['t', 'r'], ['r', "'"], ['l', 'l'],
-            ['ç', 'g'], ['ģ', 'gh'], ['x', 'k'], ['k', 'g'], ['g', 'gh'],
-            ["'", 'q']
-        ];
-
-        const vowelReplacements = {
-            'a': 'u', 'i': 'e', 'ï': 'ui', 'u': 'o', 'ü': 'ü', 'e': 'a',
-            'ë': 'oi', 'o': 'u', 'ö': 'ö', 'ā': 'a', 'ī': 'i', 'î': 'u',
-            'ū': 'u', 'û': 'ü', 'ē': 'e', 'ê': 'o', 'ō': 'o', 'ô': 'ö',
-            'ā': 'a'
-        };
-
-        function replaceLongVowels(word) {
+        // Replace long vowels function
+        function replaceLongVowels(text) {
             const replacements = {
                 'iģh': 'ī', 'ïgh': 'î', 'ugh': 'ū', 'üģh': 'û', 'eģh': 'ē', 'ëgh': 'ê',
                 'ogh': 'ō', 'öģh': 'ô', 'agh': 'ā', 'aģh': 'ā'
             };
-            for (let key in replacements) {
-                word = word.replace(new RegExp(key, 'g'), replacements[key]);
+            for (let [key, value] of Object.entries(replacements)) {
+                text = text.split(key).join(value);
             }
-            return word;
+            return text;
         }
 
-        function replaceConsonants(word) {
-            consonantReplacements.forEach(([pattern, replacement]) => {
-                word = word.replace(new RegExp(pattern, 'g'), replacement);
-            });
-            return word;
+        // Main transformation logic
+        function transformText() {
+            let input = document.getElementById("input-text").value;
+
+            // Apply text transformations
+            let transformedText = replaceLongVowels(input);
+            transformedText = replaceText(transformedText); // Call replace_text equivalent function
+
+            // Display output
+            document.getElementById("output-text").textContent = transformedText;
         }
 
-        function replaceVowels(word) {
-            Object.keys(vowelReplacements).forEach(vowel => {
-                word = word.replace(new RegExp(vowel, 'g'), vowelReplacements[vowel]);
-            });
-            return word;
-        }
+        // Replace text function, simplified
+        function replaceText(text) {
+            const consonantReplacements = [
+                [/ghr#/g, 'ghr#'], [/xr#/g, 'xr#'], [/sh#/g, 'sh#'], [/s#/g, 's#'], [/f#/g, 'f#'],
+                [/schr/g, 'kr'], [/skr/g, 'qr'], [/shr/g, 'chr'], [/sçļ/g, 'qr'], [/çhļ/g, 'kr'],
+                [/chr/g, 'j'], [/sch/g, 'k'], [/scl/g, 'sl'], [/str/g, 'kr'], [/spr/g, 'tr'],
+                [/fr/g, 'pr'], [/pr/g, 'br'], [/br/g, 'v'], [/sp/g, 't'], [/sl/g, 'cl'],
+                [/cl/g, 'dr'], [/dr/g, 'z'], [/tr/g, 'r'], [/st/g, 'k'], [/sc/g, 's'],
+                [/sh/g, 'ch'], [/ch/g, 'j'], [/çh/g, 'k'], [/ģh/g, 'x'], [/çļ/g, 'gr'],
+                [/ģļ/g, 'ghr'], [/sç/g, 'q'], [/gh/g, 'x'], [/xr/g, 'kr'], [/kr/g, 'gr'],
+                [/sk/g, 'q'], [/f/g, 'p'], [/p/g, 'b'], [/b/g, 'v'], [/s/g, 'c'],
+                [/c/g, 'd'], [/d/g, 'z'], [/t/g, 'r'], [/r/g, "'"], [/l/g, 'l'],
+                [/ç/g, 'g'], [/ģ/g, 'gh'], [/x/g, 'k'], [/k/g, 'g'], [/g/g, 'gh'],
+                [/'/g, 'q']
+            ];
 
-        function cleanString(word) {
-            return word.replace(/#/g, '').replace(/ģ/g, 'g');
-        }
+            const vowelReplacements = {
+                'a': ['i', 'u'], 'i': 'e', 'ï': 'ui', 'u': 'o', 'ü': 'ü', 'e': 'a',
+                'ë': 'oi', 'o': 'u', 'ö': 'ö', 'ā': 'a', 'ī': 'i', 'î': 'u',
+                'ū': 'u', 'û': 'ü', 'ē': 'e', 'ê': 'o', 'ō': 'o', 'ô': 'ö',
+                'ā': 'a'
+            };
 
-        function transformWord(word) {
-            word = replaceLongVowels(word);
-            word = replaceConsonants(word);
-            word = replaceVowels(word);
-            return cleanString(word);
-        }
+            // Apply consonant replacements
+            for (const [pattern, replacement] of consonantReplacements) {
+                text = text.replace(pattern, replacement);
+            }
 
-        function transformAndDisplay() {
-            const inputWord = document.getElementById("input-word").value;
-            const transformedWord = transformWord(inputWord);
-            document.getElementById("output").textContent = `入力された単語: ${inputWord} => 変換後の単語: ${transformedWord}`;
+            // Apply vowel replacements
+            for (const [key, value] of Object.entries(vowelReplacements)) {
+                if (typeof value === 'string') {
+                    text = text.replace(new RegExp(key, 'g'), value);
+                }
+            }
+
+            // Additional cleaning and return final text
+            return text.replace(/#/g, '').replace(/ģ/g, 'g');
         }
     </script>
 </body>
